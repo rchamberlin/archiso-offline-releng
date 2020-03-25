@@ -40,15 +40,15 @@ build() {
 	packages_x86_64=$(cat ${script_path}/packages.x86_64)
 	packages_aur=$(cat ${script_path}/packages.aur)
 
-	CHAIN_INJECT=""
-	if [[ packages_aur ]]
-	CHAIN_INJECT="run_once make_aur_packages\n"
-	fi
-	CHAIN_INJECT+="run_once make_offline_mirror\n"
+	# CHAIN_INJECT=""
+	# if [[ packages_aur ]]
+	# CHAIN_INJECT="run_once make_aur_packages\n"
+	# fi
+	CHAIN_INJECT="run_once make_offline_mirror\n"
 	CHAIN_INJECT+="run_once patch_in_local_mirror\n"
-	if [[ packages_aur ]]
-	CHAIN_INJECT+="run_once install_aur\n"
-	fi
+	# if [[ packages_aur ]]
+	# CHAIN_INJECT+="run_once install_aur\n"
+	# fi
 	CHAIN_INJECT+="run_once finalize_offline\n"
 
 	# Patch in the functions right before $TARGET_FUNCTION and migrate over the OFFLINE_MIRROR_PATH.
