@@ -37,16 +37,24 @@ build() {
 
 	BUILD_FUNCTIONS=$(<$srcdir/${_name}/offline_functions.sh)
 
+	packages_x86_64=$(cat ${script_path}/packages.x86_64)
+	packages_aur=$(cat ${script_path}/packages.aur)
+
+	CHAIN_INJECT=""
+	if [[ packages_aur ]]
 	CHAIN_INJECT="run_once make_aur_packages\n"
+	fi
 	CHAIN_INJECT+="run_once make_offline_mirror\n"
 	CHAIN_INJECT+="run_once patch_in_local_mirror\n"
+	if [[ packages_aur ]]
 	CHAIN_INJECT+="run_once install_aur\n"
+	fi
 	CHAIN_INJECT+="run_once finalize_offline\n"
 
 	# Patch in the functions right before $TARGET_FUNCTION and migrate over the OFFLINE_MIRROR_PATH.
 	# TODO: use sed to replace a fancy variable in offline_function.sh and insert $TARGET_FUNCTION,
 	#       since now it's hard coded and if we change in here, it won't work after this `ed` oneliner.
-	printf '%s\n' "/${TARGET_FUNCTION}/r $srcdir/${_name}/offline_functions.sh" 1 "/${TARGET_FUNCTION}/d" w | ed "$srcdir/usr/share/archiso/configs/offline_releng/build.sh"
+	printf '%s\n' "/${TARGET_FUNCTION}/r $srcdir/${_name}/offline_functions.sh" 1 "/${TARGET_FUNCTION}/d" w | sed "$srcdir/usr/share/archiso/configs/offline_releng/build.sh"
 	sed -i "s;verbose=;offline_mirror_path=${OFFLINE_MIRROR_PATH}\n&;" "$srcdir/usr/share/archiso/configs/offline_releng/build.sh"
 
 	# Patch in the function calls before $TARGET_FUNCTION_CHAIN
